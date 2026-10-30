@@ -1,0 +1,232 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{titling}
+
+\geometry{margin=2.2cm}
+
+\title{Verificação e Validação de Software \\ \large Trabalho 2: Cobertura de Código e Teste de Mutação da Tarifa de Estacionamento}
+\author{Eduardo Alcaria \\ Arthur Pimentel \\ Ethan Soares}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2.5em}
+
+\section*{Introdução}
+
+Este relatório aplica cobertura de código (JaCoCo 0.8.12) e teste de mutação
+(PIT 1.17.4 com \texttt{pitest-junit5-plugin} 1.2.1) sobre a classe
+\texttt{CalculadoraTarifa} e a suíte JUnit 5 produzida no Trabalho 1. O ambiente
+usado foi Java 17 e Maven 3.9. A suíte original possui 25 execuções de teste
+(\texttt{CalculadoraTarifaTest}); os casos novos deste trabalho estão na classe
+driver \texttt{CalculadoraTarifaComplementarTest}, com 27 execuções, totalizando
+52 execuções, todas aprovadas.
+
+\section{Análise crítica da cobertura de código (JaCoCo)}
+
+\subsection{Resultado inicial}
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+Métrica & Perdidos & Cobertos & Cobertura \\
+\midrule
+Instruções & 0 & 160 & 100\% \\
+Branches & 0 & 20 & 100\% \\
+Linhas & 0 & 38 & 100\% \\
+Métodos & 0 & 9 & 100\% \\
+Complexidade ciclomática & 0 & 19 & 100\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Cobertura por método (todos com 0 itens perdidos): \texttt{calcular} (31
+instruções, 2 branches), \texttt{calcularPerNoite} (16, 2),
+\texttt{calcularDescontoVip} (8, 2), \texttt{calcularPorPermanencia} (31, 4),
+\texttt{contarPernoites} (24, 2), \texttt{validarEntrada} (11, 2),
+\texttt{validarSaida} (23, 6), além do construtor e do inicializador estático.
+
+\subsection{Análise crítica}
+
+A suíte do Trabalho 1 já atinge 100\% em todas as métricas do JaCoCo. Portanto
+\textbf{não há linha, branch ou método sem cobertura} e nenhum caso de teste é
+estritamente necessário para elevar a cobertura. Isso decorre de a suíte ter sido
+projetada por particionamento em classes de equivalência e análise de valor
+limite sobre cada regra de negócio, o que exercita naturalmente os dois lados de
+cada decisão.
+
+Cobertura de 100\% não prova que os testes verifiquem o resultado correto, apenas
+que o código foi executado. Por isso foram acrescentados casos complementares,
+orientados à técnica de projeto (e não a uma lacuna do JaCoCo), em regiões onde a
+suíte original era rasa:
+
+\begin{itemize}
+\item Cliente VIP exercitado apenas em 3 casos; faltavam fronteiras de 60, 61 e 121 minutos e múltiplas diárias.
+\item Pernoite testado com 1 e 2 diárias; faltava 3 diárias, virada de mês, virada de ano e ano bissexto.
+\item Janela de saída proibida testada só nos limites 02:00 e 07:59 e no ponto 05:00; faltavam 02:01 e 07:58.
+\item Permanência longa no mesmo dia testada até 4 h; faltavam 180/181 min e o teto de 23:59.
+\item Saída às 01:59 de dois dias depois (uma pernoite, não duas).
+\end{itemize}
+
+\subsection{Novos casos de teste (resultados válidos)}
+
+\small
+\begin{longtable}{@{}l p{4.2cm} p{3.0cm} c r p{2.4cm}@{}}
+\toprule
+ID & Entrada & Saída & VIP & Esperado & Técnica \\
+\midrule
+\endhead
+CC01 & 10/03/2026 08:00 & 10/03/2026 11:00 & não & 25,00 & Valor limite \\
+CC02 & 10/03/2026 08:00 & 10/03/2026 11:01 & não & 30,00 & Valor limite \\
+CC03 & 10/03/2026 08:00 & 10/03/2026 23:59 & não & 90,00 & Valor limite \\
+CC04 & 10/03/2026 22:00 & 10/03/2026 23:59 & não & 20,00 & Valor limite \\
+CC05 & 10/03/2026 23:00 & 11/03/2026 00:00 & não & 15,00 & Valor limite \\
+CC06 & 10/03/2026 23:59 & 11/03/2026 01:59 & não & 20,00 & Valor limite \\
+CC07 & 10/03/2026 23:59 & 11/03/2026 08:00 & não & 50,00 & Valor limite \\
+CC08 & 10/03/2026 20:00 & 11/03/2026 08:01 & não & 50,00 & Valor limite \\
+CC09 & 10/03/2026 20:00 & 12/03/2026 01:59 & não & 50,00 & Classe equiv. \\
+CC10 & 10/03/2026 10:00 & 13/03/2026 10:00 & não & 150,00 & Classe equiv. \\
+CC11 & 31/03/2026 20:00 & 01/04/2026 08:00 & não & 50,00 & Valor limite \\
+CC12 & 31/12/2026 20:00 & 01/01/2027 08:00 & não & 50,00 & Valor limite \\
+CC13 & 28/02/2028 20:00 & 01/03/2028 08:00 & não & 100,00 & Valor limite \\
+CC14 & 10/03/2026 08:00 & 10/03/2026 09:00 & sim & 7,50 & Valor limite \\
+CC15 & 10/03/2026 08:00 & 10/03/2026 09:01 & sim & 10,00 & Valor limite \\
+CC16 & 10/03/2026 08:00 & 10/03/2026 10:01 & sim & 12,50 & Valor limite \\
+CC17 & 10/03/2026 08:00 & 10/03/2026 08:20 & sim & 0,00 & Valor limite \\
+CC18 & 10/03/2026 20:00 & 12/03/2026 08:00 & sim & 50,00 & Classe equiv. \\
+CC19 & 10/03/2026 10:00 & 13/03/2026 10:00 & sim & 75,00 & Classe equiv. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Novos casos de teste (resultados inválidos, esperada \texttt{IllegalArgumentException})}
+
+\small
+\begin{longtable}{@{}l p{4.2cm} p{4.2cm} c p{2.8cm}@{}}
+\toprule
+ID & Entrada & Saída & VIP & Motivo \\
+\midrule
+\endhead
+CI01 & 10/03/2026 20:00 & 11/03/2026 02:01 & não & Saída na janela proibida \\
+CI02 & 10/03/2026 20:00 & 11/03/2026 07:58 & não & Saída na janela proibida \\
+CI03 & 10/03/2026 20:00 & 12/03/2026 05:00 & não & Saída na janela proibida \\
+CI04 & 10/03/2026 07:59 & 10/03/2026 09:00 & sim & Entrada antes das 08:00 \\
+CI05 & 10/03/2026 20:00 & 11/03/2026 03:00 & sim & Saída na janela proibida \\
+CI06 & 10/03/2026 10:00 & 10/03/2026 09:59 & sim & Saída antes da entrada \\
+CI07 & 10/03/2026 10:00 & 10/03/2026 10:00 & sim & Saída igual à entrada \\
+CI08 & 10/03/2026 10:00 & 09/03/2026 12:00 & não & Saída em dia anterior \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Resultado após os novos casos}
+
+Cobertura inalterada em 100\% (160/160 instruções, 20/20 branches, 38/38 linhas,
+9/9 métodos), o que é esperado, já que não havia lacuna a fechar.
+
+\section{Análise crítica do teste de mutação (PIT)}
+
+\subsection{Resultado inicial}
+
+Com o grupo de mutadores \texttt{DEFAULTS}:
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Mutantes gerados & 32 \\
+Mortos & 30 \\
+Sobreviventes & 2 \\
+Mutation score & 93,75\% \\
+Mutation score ajustado (sem equivalentes) & 100\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Para uma verificação mais rigorosa, a análise foi repetida com os grupos
+\texttt{STRONGER} (42 mutantes: 39 mortos, 1 \emph{timeout}, 2 sobreviventes) e
+\texttt{ALL} (94 mutantes: 88 mortos, 4 \emph{timeout}, 2 sobreviventes). Os
+\emph{timeouts} ocorrem em \texttt{contarPernoites}: mutantes que tornam o
+\texttt{while} infinito, contabilizados pelo PIT como detectados.
+
+\subsection{Mutantes sobreviventes}
+
+Os mesmos dois sobreviventes aparecem em todos os grupos, ambos em
+\texttt{calcularPorPermanencia}, linha 53, \texttt{if (minutos <= MINUTOS\_TARIFA\_FIXA)}:
+
+\begin{center}
+\small
+\begin{tabular}{@{}p{4.3cm} p{4.8cm} p{5.2cm}@{}}
+\toprule
+Mutador & Mutação & Classificação \\
+\midrule
+\texttt{ConditionalsBoundaryMutator} & \texttt{<=} vira \texttt{<} & Equivalente \\
+\texttt{RemoveConditionalMutator\_ORDER\_ELSE} & condição substituída por \texttt{false} & Equivalente \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Mutante 1 (\texttt{<=} para \texttt{<}).} A única entrada em que o
+comportamento da condição muda é \texttt{minutos == 60}. No original retorna
+\texttt{15,0}. No mutante, o fluxo segue: \texttt{minutosExcedentes = 0},
+\texttt{horasAdicionais = (0 + 59) / 60 = 0}, resultado \texttt{15 + 0 * 5 = 15,0}.
+Mesma saída, logo equivalente.
+
+\textbf{Mutante 2 (condição sempre falsa).} Para \texttt{21 <= minutos <= 60}
+(a cortesia já foi tratada na linha 50), \texttt{minutosExcedentes} está em
+$[-39, 0]$, então \texttt{minutosExcedentes + 59} está em $[20, 59]$ e a divisão
+inteira por 60 resulta em 0, gerando \texttt{15,0}, idêntico ao original. Logo
+equivalente.
+
+Como ambos são equivalentes, nenhum teste é capaz de matá-los sem alterar o
+código de produção. Opcionalmente, o ramo da linha 53 poderia ser removido
+(refatoração que preserva o comportamento e elimina a redundância), mas isso foge
+ao escopo do trabalho, que consiste em complementar testes.
+
+\subsection{Análise crítica}
+
+A suíte do Trabalho 1 já mata todos os mutantes não equivalentes, inclusive com
+mutadores além do padrão. Não há mutante não equivalente a cobrir com novos
+casos. Os casos CC01 a CC19 e CI01 a CI08 reforçam as regiões de fronteira
+descritas na Seção 1, reduzindo o risco de regressões não capturadas pelo
+conjunto de mutadores do PIT (por exemplo, falhas de arredondamento em horas
+adicionais e virada de calendário).
+
+\subsection{Resultado após os novos casos}
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Métrica & Antes & Depois \\
+\midrule
+Execuções de teste & 25 & 52 \\
+Mutantes gerados (\texttt{DEFAULTS}) & 32 & 32 \\
+Mortos (\texttt{DEFAULTS}) & 30 & 30 \\
+Sobreviventes (\texttt{DEFAULTS}) & 2 & 2 \\
+Mutation score (\texttt{DEFAULTS}) & 93,75\% & 93,75\% \\
+Mutantes gerados (\texttt{ALL}) & 94 & 94 \\
+Sobreviventes (\texttt{ALL}) & 2 & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+O score não muda porque os únicos sobreviventes são equivalentes. Os novos casos
+ampliam a verificação do comportamento sem alterar o resultado das métricas.
+
+\section{Como reproduzir}
+
+\begin{verbatim}
+mvn test
+mvn test-compile org.pitest:pitest-maven:mutationCoverage
+mvn test-compile org.pitest:pitest-maven:mutationCoverage -Dmutators=ALL
+\end{verbatim}
+
+Relatório JaCoCo em \texttt{target/site/jacoco/index.html} e relatório PIT em
+\texttt{target/pit-reports/index.html}.
+
+\end{document}
