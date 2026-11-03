@@ -16,6 +16,7 @@ para avaliar e complementar a suite de testes existente.
 | `src/test/.../CalculadoraTarifaComplementarTest.java` | novo: 27 execucoes de teste (19 validas e 8 invalidas) |
 | `relatorio_t2.pdf` | novo: relatorio do Trabalho 2 |
 | `docs/relatorio_t2.tex` | novo: fonte latex do relatorio |
+| `docs/img/*.png` | novo: prints dos relatorios JaCoCo e PIT usados no relatorio |
 | `README.md` | reescrito para o Trabalho 2 |
 
 Nao foram alterados: `CalculadoraTarifa.java` (codigo de producao) e
@@ -66,6 +67,11 @@ Trabalho 1 era rasa, usando classes de equivalencia e valor limite:
 - permanencia de 180 e 181 minutos e teto de 23:59 no mesmo dia;
 - entradas e saidas invalidas combinadas com VIP.
 
+Rodando o PIT (`ALL`) somente com a classe nova, ela mata 88 dos 94 mutantes
+(mais 3 timeouts); sobrevivem os 2 equivalentes e a constante `20` trocada por
+`21` na cortesia, que a suite do Trabalho 1 mata (CT03). Somadas as duas
+classes, restam so os 2 equivalentes.
+
 Como a cobertura ja era total e os unicos mutantes sobreviventes sao
 equivalentes, esses testes nao alteram as metricas. Eles ampliam a verificacao do
 comportamento.
@@ -90,6 +96,7 @@ src/main/java/br/pucrs/verival/estacionamento/CalculadoraTarifa.java
 src/test/java/br/pucrs/verival/estacionamento/CalculadoraTarifaTest.java
 src/test/java/br/pucrs/verival/estacionamento/CalculadoraTarifaComplementarTest.java
 docs/relatorio_t2.tex          fonte latex do relatorio do Trabalho 2
+docs/img/                      prints dos relatorios JaCoCo e PIT
 docs/casos_de_teste.*          Trabalho 1
 docs/defeitos_encontrados.*    Trabalho 1
 ```
