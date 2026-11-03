@@ -11,6 +11,8 @@
 \usepackage{float}
 
 \geometry{margin=2.2cm}
+\sloppy
+\emergencystretch=3em
 
 \title{Verificação e Validação de Software \\ \large Trabalho 2: Cobertura de Código e Teste de Mutação da Tarifa de Estacionamento}
 \author{Eduardo Alcaria \\ Arthur Pimentel \\ Ethan Soares}
@@ -113,10 +115,12 @@ CC19 & 10/03/2026 10:00 & 13/03/2026 10:00 & sim & 75,00 & Classe equiv. \\
 \end{longtable}
 \normalsize
 
-\subsection{Novos casos de teste (resultados inválidos, esperada \texttt{IllegalArgumentException})}
+\subsection{Novos casos de teste (resultados inválidos)}
+
+Todos esperam \texttt{IllegalArgumentException}.
 
 \small
-\begin{longtable}{@{}l p{4.2cm} p{4.2cm} c p{2.8cm}@{}}
+\begin{longtable}{@{}l p{3.5cm} p{3.5cm} c p{4.4cm}@{}}
 \toprule
 ID & Entrada & Saída & VIP & Motivo \\
 \midrule
