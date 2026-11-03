@@ -275,6 +275,39 @@ Sobreviventes (\texttt{ALL}) & 2 & 2 \\
 O score não muda porque os únicos sobreviventes são equivalentes. Os novos casos
 ampliam a verificação do comportamento sem alterar o resultado das métricas.
 
+\section{Conclusão: aceitação da classe}
+
+O objetivo do trabalho é decidir, a partir da cobertura e da mutação, se a classe
+entregue pode ser aceita ou deve ser rejeitada. Os critérios adotados e os
+resultados medidos são:
+
+\begin{center}
+\small
+\begin{tabular}{@{}p{6.4cm} p{3.4cm} p{3.2cm}@{}}
+\toprule
+Critério de aceitação & Resultado & Atende \\
+\midrule
+Cobertura de instruções e branches de 100\% & 160/160 e 20/20 & sim \\
+Cobertura de linhas e métodos de 100\% & 38/38 e 9/9 & sim \\
+Todos os mutantes não equivalentes mortos (\texttt{DEFAULTS}, \texttt{STRONGER}, \texttt{ALL}) & 0 sobreviventes não equivalentes & sim \\
+Sobreviventes restantes justificados & 2, ambos equivalentes (prova na Seção 2) & sim \\
+Todos os testes aprovados & 52 de 52 & sim \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Veredito: a classe \texttt{CalculadoraTarifa} é aceita.} A suíte executa todo
+o código, exercita os dois lados de cada decisão e detecta toda alteração de
+comportamento introduzida pelos mutadores do PIT, exceto duas que não mudam o
+comportamento observável. A aceitação decorre da qualidade da suíte do Trabalho 1,
+já suficiente; os casos novos reforçam a verificação, mas não eram necessários para
+atingir os critérios.
+
+Ressalva: cobertura e mutação medem a qualidade dos testes frente ao código
+existente, e não provam ausência de defeitos. Um requisito mal interpretado e
+testado de forma coerente com essa interpretação não seria detectado por essas
+técnicas.
+
 \section{Como reproduzir}
 
 \begin{verbatim}
@@ -283,7 +316,9 @@ mvn test-compile org.pitest:pitest-maven:mutationCoverage
 mvn test-compile org.pitest:pitest-maven:mutationCoverage -Dmutators=ALL
 \end{verbatim}
 
-Relatório JaCoCo em \texttt{target/site/jacoco/index.html} e relatório PIT em
-\texttt{target/pit-reports/index.html}.
+\begin{itemize}
+\item Relatório JaCoCo: \texttt{target/site/jacoco/index.html}
+\item Relatório PIT: \texttt{target/pit-reports/index.html}
+\end{itemize}
 
 \end{document}
