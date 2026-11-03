@@ -76,6 +76,13 @@ Como a cobertura ja era total e os unicos mutantes sobreviventes sao
 equivalentes, esses testes nao alteram as metricas. Eles ampliam a verificacao do
 comportamento.
 
+## Conclusao
+
+A classe `CalculadoraTarifa` e **aceita**: cobertura de 100% em instrucao, branch,
+linha e metodo; todos os mutantes nao equivalentes mortos; os 2 sobreviventes sao
+equivalentes; 52 de 52 testes aprovados. Detalhes e ressalvas em
+`relatorio_t2.pdf`.
+
 ## Regras de negocio
 
 - Entrada permitida das 08:00 as 23:59.
