@@ -7,6 +7,8 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{titling}
+\usepackage{graphicx}
+\usepackage{float}
 
 \geometry{margin=2.2cm}
 
@@ -51,6 +53,12 @@ instruções, 2 branches), \texttt{calcularPerNoite} (16, 2),
 \texttt{calcularDescontoVip} (8, 2), \texttt{calcularPorPermanencia} (31, 4),
 \texttt{contarPernoites} (24, 2), \texttt{validarEntrada} (11, 2),
 \texttt{validarSaida} (23, 6), além do construtor e do inicializador estático.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{img/jacoco_metodos.png}
+\caption{Relatório do JaCoCo para \texttt{CalculadoraTarifa}: 0 de 160 instruções e 0 de 20 branches perdidos.}
+\end{figure}
 
 \subsection{Análise crítica}
 
@@ -161,7 +169,7 @@ Os mesmos dois sobreviventes aparecem em todos os grupos, ambos em
 
 \begin{center}
 \small
-\begin{tabular}{@{}p{4.3cm} p{4.8cm} p{5.2cm}@{}}
+\begin{tabular}{@{}p{6.6cm} p{4.6cm} p{2.6cm}@{}}
 \toprule
 Mutador & Mutação & Classificação \\
 \midrule
@@ -188,6 +196,18 @@ código de produção. Opcionalmente, o ramo da linha 53 poderia ser removido
 (refatoração que preserva o comportamento e elimina a redundância), mas isso foge
 ao escopo do trabalho, que consiste em complementar testes.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{img/pit_resumo.png}
+\caption{Resumo do PIT (\texttt{DEFAULTS}): 30 de 32 mutantes mortos.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{img/pit_codigo_linha53.png}
+\caption{Código anotado pelo PIT: a linha 53 (em vermelho) concentra os dois mutantes sobreviventes.}
+\end{figure}
+
 \subsection{Análise crítica}
 
 A suíte do Trabalho 1 já mata todos os mutantes não equivalentes, inclusive com
@@ -196,6 +216,43 @@ casos. Os casos CC01 a CC19 e CI01 a CI08 reforçam as regiões de fronteira
 descritas na Seção 1, reduzindo o risco de regressões não capturadas pelo
 conjunto de mutadores do PIT (por exemplo, falhas de arredondamento em horas
 adicionais e virada de calendário).
+
+Para medir a contribuição própria dos casos novos, o PIT foi executado com o
+grupo \texttt{ALL} usando \emph{apenas} a classe
+\texttt{CalculadoraTarifaComplementarTest}: dos 94 mutantes, 88 foram mortos, 3
+terminaram em \emph{timeout} e 3 sobreviveram. Os sobreviventes são os dois
+equivalentes da linha 53 e o mutante \texttt{InlineConstantMutator} da linha 50
+(\texttt{20} substituído por \texttt{21}), que os casos novos não distinguem
+porque nenhum deles tem exatamente 21 minutos sem VIP. Esse mutante é morto pela
+suíte do Trabalho 1 (caso CT03, 21 min). Somadas as duas classes, restam apenas
+os dois equivalentes.
+
+\subsection{Novos casos de teste e mutantes alvo}
+
+A tabela relaciona cada grupo de casos novos ao método e ao tipo de mutação que
+ele foi projetado para exercitar. A última coluna vem da execução do PIT com
+\texttt{ALL} e somente a classe complementar, e conta os mutantes de cada método
+mortos por \emph{todos} os casos da classe, não por caso individual.
+
+\small
+\begin{longtable}{@{}p{2.3cm} p{4.5cm} p{4.9cm} p{3.0cm}@{}}
+\toprule
+Casos & Método alvo & Mutações exercitadas & Mutantes mortos (classe nova) \\
+\midrule
+\endhead
+CC01 a CC06 & \texttt{calcularPorPermanencia} & fronteira de \texttt{<=}, constantes 20/60, cálculo de horas adicionais (aritmética e arredondamento) & 23 de 26 \\
+CC07 a CC13 & \texttt{contarPernoites}, \texttt{calcularPerNoite} & fronteira do laço \texttt{while}, avanço de \texttt{plusDays}, multiplicação pelo valor da diária & 13 mortos e 3 \emph{timeout} de 16; 12 de 12 \\
+CC14 a CC19 & \texttt{calcularDescontoVip} & negação do \texttt{if (vip)}, troca de \texttt{*} por \texttt{/}, valor de retorno & 7 de 7 \\
+CI01 a CI03, CI05 & \texttt{validarSaida} & limites da janela 02:00--07:59, negações e remoção de condicionais & 15 de 15 \\
+CI04 & \texttt{validarEntrada} & limite de \texttt{isBefore(ABERTURA)} & 6 de 6 \\
+CI06 a CI08 & \texttt{calcular} & negação de \texttt{!saida.isAfter(entrada)}, remoção das chamadas de validação & 12 de 12 \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+Os casos individuais, com entradas e saídas esperadas, estão nas tabelas da
+Seção 1. Nenhum deles mata os dois mutantes equivalentes da linha 53, pois eles
+não alteram o comportamento observável.
 
 \subsection{Resultado após os novos casos}
 
